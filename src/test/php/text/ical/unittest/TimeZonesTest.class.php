@@ -1,19 +1,19 @@
 <?php namespace text\ical\unittest;
 
-use unittest\TestCase;
 use text\ical\ICalendar;
+use unittest\{Test, BeforeClass, AfterClass, Values, TestCase};
 use util\Date;
 
 class TimeZonesTest extends TestCase {
   private static $tz;
 
-  #[@beforeClass]
+  #[BeforeClass]
   public static function useGMT() {
     self::$tz= date_default_timezone_get();
     date_default_timezone_set('GMT');
   }
 
-  #[@afterClass]
+  #[AfterClass]
   public static function restoreTZ() {
     date_default_timezone_set(self::$tz);
   }
@@ -29,17 +29,40 @@ class TimeZonesTest extends TestCase {
     return $calendar= (new ICalendar())->read($source)->timezones()[0];
   }
 
-  #[@test, @values([
-  #  ['20180101T000000', '2018-01-01 00:00:00 Europe/Berlin', 'Standard'],
-  #  ['20180330T192800', '2018-03-30 19:28:00 Europe/Berlin', 'Daylight'],
-  #  ['20180325T015959', '2018-03-25 01:59:59 Europe/Berlin', 'One second before transition to daylight'],
-  #  ['20180325T020000', '2018-03-25 03:00:00 Europe/Berlin', 'Transition to daylight'],
-  #  ['20180325T020001', '2018-03-25 03:00:01 Europe/Berlin', 'One second after transition to daylight'],
-  #  ['20180325T030001', '2018-03-25 03:00:01 Europe/Berlin', 'One second after transition to daylight'],
-  #  ['20181028T025959', '2018-10-28 02:59:59 Europe/Berlin', 'One second before transition to standard'],
-  #  ['20181028T030000', '2018-10-28 03:00:00 Europe/Berlin', 'Transition to standard'],
-  #  ['20181028T030001', '2018-10-28 03:00:01 Europe/Berlin', 'One second after transition to standard'],
-  #])]
+  /** @return iterable */
+  private function europeBerlin() {
+    yield ['20180101T000000', '2018-01-01 00:00:00 Europe/Berlin', 'Standard'];
+    yield ['20180330T192800', '2018-03-30 19:28:00 Europe/Berlin', 'Daylight'];
+    yield ['20180325T015959', '2018-03-25 01:59:59 Europe/Berlin', 'One second before transition to daylight'];
+    yield ['20180325T020000', '2018-03-25 03:00:00 Europe/Berlin', 'Transition to daylight'];
+    yield ['20180325T020001', '2018-03-25 03:00:01 Europe/Berlin', 'One second after transition to daylight'];
+    yield ['20180325T030001', '2018-03-25 03:00:01 Europe/Berlin', 'One second after transition to daylight'];
+    yield ['20181028T025959', '2018-10-28 02:59:59 Europe/Berlin', 'One second before transition to standard'];
+    yield ['20181028T030000', '2018-10-28 03:00:00 Europe/Berlin', 'Transition to standard'];
+    yield ['20181028T030001', '2018-10-28 03:00:01 Europe/Berlin', 'One second after transition to standard'];
+  }
+
+  /** @return iterable */
+  private function americaNY() {
+    yield ['20180101T000000', '2018-01-01 00:00:00 America/New_York', 'Standard'];
+    yield ['20180401T115500', '2018-04-01 11:55:00 America/New_York', 'Daylight'];
+    yield ['20180311T015959', '2018-03-11 01:59:59 America/New_York', 'One second before transition to daylight'];
+    yield ['20180311T020000', '2018-03-11 03:00:00 America/New_York', 'Transition to daylight'];
+    yield ['20180311T020001', '2018-03-11 03:00:01 America/New_York', 'One second after transition to daylight'];
+    yield ['20180311T030001', '2018-03-11 03:00:01 America/New_York', 'One second after transition to daylight'];
+    yield ['20181104T025959', '2018-11-04 02:59:59 America/New_York', 'One second before transition to standard'];
+    yield ['20181104T030000', '2018-11-04 03:00:00 America/New_York', 'Transition to standard'];
+    yield ['20181104T030001', '2018-11-04 03:00:01 America/New_York', 'One second after transition to standard'];
+  }
+
+  /** @return iterable */
+  private function europeParis() {
+    yield ['20070101T000000', '2007-01-01 00:00:00 Europe/Paris', 'Standard'];
+    yield ['20061029T020000', '2006-10-29 02:00:00 Europe/Paris', 'Standard'];
+    yield ['20070325T020000', '2007-03-25 02:00:00 Europe/Paris', 'Daylight'];
+  }
+
+  #[Test, Values('europeBerlin')]
   public function west_europe_standard_time_with_rrule($input, $expected) {
     $tz= $this->parse('
       BEGIN:VTIMEZONE
@@ -61,17 +84,7 @@ class TimeZonesTest extends TestCase {
     $this->assertEquals(new Date($expected), $tz->convert($input));
   }
 
-  #[@test, @values([
-  #  ['20180101T000000', '2018-01-01 00:00:00 America/New_York', 'Standard'],
-  #  ['20180401T115500', '2018-04-01 11:55:00 America/New_York', 'Daylight'],
-  #  ['20180311T015959', '2018-03-11 01:59:59 America/New_York', 'One second before transition to daylight'],
-  #  ['20180311T020000', '2018-03-11 03:00:00 America/New_York', 'Transition to daylight'],
-  #  ['20180311T020001', '2018-03-11 03:00:01 America/New_York', 'One second after transition to daylight'],
-  #  ['20180311T030001', '2018-03-11 03:00:01 America/New_York', 'One second after transition to daylight'],
-  #  ['20181104T025959', '2018-11-04 02:59:59 America/New_York', 'One second before transition to standard'],
-  #  ['20181104T030000', '2018-11-04 03:00:00 America/New_York', 'Transition to standard'],
-  #  ['20181104T030001', '2018-11-04 03:00:01 America/New_York', 'One second after transition to standard'],
-  #])]
+  #[Test, Values('americaNY')]
   public function new_york_time_with_rrule($input, $expected) {
     $tz= $this->parse('
      BEGIN:VTIMEZONE
@@ -97,11 +110,7 @@ class TimeZonesTest extends TestCase {
     $this->assertEquals(new Date($expected), $tz->convert($input));
   }
 
-  #[@test, @values([
-  #  ['20070101T000000', '2007-01-01 00:00:00 Europe/Paris', 'Standard'],
-  #  ['20061029T020000', '2006-10-29 02:00:00 Europe/Paris', 'Standard'],
-  #  ['20070325T020000', '2007-03-25 02:00:00 Europe/Paris', 'Daylight'],
-  #])]
+  #[Test, Values('europeParis')]
   public function europe_paris_without_rrule($input, $expected) {
     $tz= $this->parse('
       BEGIN:VTIMEZONE

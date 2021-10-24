@@ -1,24 +1,56 @@
 <?php namespace text\ical;
 
-use lang\partial\Value;
-use lang\partial\Builder;
 use lang\IllegalStateException;
+use util\Objects;
 
 class TimeZoneInfo implements IObject {
-  use TimeZoneInfo\is\Value;
-  use TimeZoneInfo\with\Builder;
+  private $dtstart, $tzoffsetfrom, $tzoffsetto, $rrule;
 
-  /** @type string */
-  private $dtstart;
+  /**
+   * Constructor
+   *
+   * @param string $dtstart
+   * @param string $tzoffsetfrom
+   * @param string $tzoffsetto
+   * @param string $rrule
+   */
+  public function __construct($dtstart, $tzoffsetfrom, $tzoffsetto, $rrule) {
+    $this->dtstart= $dtstart;
+    $this->tzoffsetfrom= $tzoffsetfrom;
+    $this->tzoffsetto= $tzoffsetto;
+    $this->rrule= $rrule;
+  }
 
-  /** @type string */
-  private $tzoffsetfrom;
+  /** @return string */
+  public function dtstart() { return $this->dtstart; }
 
-  /** @type string */
-  private $tzoffsetto;
+  /** @return string */
+  public function tzoffsetfrom() { return $this->tzoffsetfrom; }
 
-  /** @type string */
-  private $rrule;
+  /** @return string */
+  public function tzoffsetto() { return $this->tzoffsetto; }
+
+  /** @return string */
+  public function rrule() { return $this->rrule; }
+
+  /** @return object */
+  public static function with() {
+    return new class() {
+      private $dtstart, $tzoffsetfrom, $tzoffsetto, $rrule;
+
+      public function dtstart($value) { $this->dtstart= $value; return $this; }
+
+      public function tzoffsetfrom($value) { $this->tzoffsetfrom= $value; return $this; }
+
+      public function tzoffsetto($value) { $this->tzoffsetto= $value; return $this; }
+
+      public function rrule($value) { $this->rrule= $value; return $this; }
+
+      public function create() {
+        return new TimeZoneInfo($this->dtstart, $this->tzoffsetfrom, $this->tzoffsetto, $this->rrule);
+      }
+    };
+  }
 
   /** @return int */
   public function offset() {
@@ -63,7 +95,7 @@ class TimeZoneInfo implements IObject {
       // -1SU = "Last Sunday in month"
       // 1SU  = "First Sunday in month"
       // 2SU  = "Second Sunday in month"
-      if ('-' === $r['BYDAY']{0}) {
+      if ('-' === $r['BYDAY'][0]) {
         $month= (int)$r['BYMONTH'] + 1;
         $by= $days[substr($r['BYDAY'], 2)];
         $last= idate('w', gmmktime(0, 0, 0, $month, -1, $year));
@@ -72,7 +104,7 @@ class TimeZoneInfo implements IObject {
         $month= (int)$r['BYMONTH'];
         $by= $days[substr($r['BYDAY'], 1)];
         $first= idate('w', gmmktime(0, 0, 0, $month, 0, $year));
-        $day= $by + $first + 1 + 7 * ($r['BYDAY']{0} - 1);
+        $day= $by + $first + 1 + 7 * ($r['BYDAY'][0] - 1);
       }
 
       return gmmktime($start[3], $start[4], $start[5], $month, $day, $year);
@@ -93,5 +125,21 @@ class TimeZoneInfo implements IObject {
       'tzoffsetto'   => $this->tzoffsetto,
       'rrule'        => $this->rrule
     ]);
+  }
+
+  /** @return string */
+  public function hashCode() { return Objects::hashOf((array)$this); }
+
+  /** @return string */
+  public function toString() { return nameof($this).'@'.Objects::stringOf(get_object_vars($this)); }
+
+  /**
+   * Compare
+   *
+   * @param  var $value
+   * @return int
+   */
+  public function compareTo($value) {
+    return $value instanceof self ? Objects::compare((array)$this, (array)$value) : 1;
   }
 }

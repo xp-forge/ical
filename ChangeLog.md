@@ -3,6 +3,29 @@ iCal ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 4.0.0 / 2021-10-24
+
+* Made library compatible with XP 11, PHP 8.1 - @thekid
+* Implemented xp-framework/rfc#341, dropping compatibility with XP 9
+  (@thekid)
+* Merged PR #6: Remove dependency on xp-forge/partial library - @thekid
+
+## 3.0.0 / 2020-04-10
+
+* Implemented xp-framework/rfc#334: Drop PHP 5.6:
+  . **Heads up:** Minimum required PHP version now is PHP 7.0.0
+  . Rewrote code base, grouping use statements
+  . Rewrote `isset(X) ? X : default` to `X ?? default`
+  (@thekid)
+
+## 2.1.2 / 2020-04-04
+
+* Made compatible with XP 10 - @thekid
+
+## 2.1.1 / 2018-10-16
+
+* Fixed line length not to exceed 75 characters - @thekid
+
 ## 2.1.0 / 2018-03-30
 
 * Fixed PHP 7.2 compatibility by renaming the text.ical.Object interface

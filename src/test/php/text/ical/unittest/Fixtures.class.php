@@ -1,16 +1,7 @@
 <?php namespace text\ical\unittest;
 
 use lang\Enum;
-use text\ical\Calendar;
-use text\ical\Event;
-use text\ical\Organizer;
-use text\ical\Attendee;
-use text\ical\Text;
-use text\ical\IDate;
-use text\ical\Alarm;
-use text\ical\Trigger;
-use text\ical\TimeZone;
-use text\ical\TimeZoneInfo;
+use text\ical\{Alarm, Attendee, Calendar, IDate, Event, Organizer, Text, TimeZone, TimeZoneInfo, Trigger};
 
 class Fixtures extends Enum {
   public static $calendar, $event, $timezone, $alarm, $quoting, $properties;

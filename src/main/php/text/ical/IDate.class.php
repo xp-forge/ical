@@ -1,17 +1,41 @@
 <?php namespace text\ical;
 
-use lang\partial\Value;
-use lang\partial\Builder;
+use util\Objects;
 
 class IDate implements IObject {
-  use IDate\is\Value;
-  use IDate\with\Builder;
+  private $tzid, $value;
 
-  /** @type string */
-  private $tzid;
+  /**
+   * Constructor
+   *
+   * @param string $tzid
+   * @param string $value
+   */
+  public function __construct($tzid, $value) {
+    $this->tzid= $tzid;
+    $this->value= $value;
+  }
 
-  /** @type string */
-  private $value;
+  /** @return string */
+  public function tzid() { return $this->tzid; }
+
+  /** @return string */
+  public function value() { return $this->value; }
+
+  /** @return object */
+  public static function with() {
+    return new class() {
+      private $tzid, $value;
+
+      public function tzid($value) { $this->tzid= $value; return $this; }
+
+      public function value($value) { $this->value= $value; return $this; }
+
+      public function create() {
+        return new Date($this->tzid, $this->value);
+      }
+    };
+  }
 
   /**
    * Write this object
@@ -22,5 +46,21 @@ class IDate implements IObject {
    */
   public function write($out, $name) {
     $out->pair($name, ['tzid' => $this->tzid], $this->value);
+  }
+
+  /** @return string */
+  public function hashCode() { return Objects::hashOf((array)$this); }
+
+  /** @return string */
+  public function toString() { return nameof($this).'@'.Objects::stringOf(get_object_vars($this)); }
+
+  /**
+   * Compare
+   *
+   * @param  var $value
+   * @return int
+   */
+  public function compareTo($value) {
+    return $value instanceof self ? Objects::compare((array)$this, (array)$value) : 1;
   }
 }
