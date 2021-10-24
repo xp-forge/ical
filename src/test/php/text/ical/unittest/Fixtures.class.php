@@ -1,8 +1,9 @@
 <?php namespace text\ical\unittest;
 
-use text\ical\{Alarm, Attendee, Calendar, Date, Event, Organizer, Text, TimeZone, TimeZoneInfo, Trigger};
+use lang\Enum;
+use text\ical\{Alarm, Attendee, Calendar, IDate, Event, Organizer, Text, ITimeZone, TimeZoneInfo, Trigger};
 
-class Fixtures extends \lang\Enum {
+class Fixtures extends Enum {
   public static $calendar, $event, $timezone, $alarm, $quoting, $properties;
 
   static function __static() {
@@ -74,8 +75,8 @@ class Fixtures extends \lang\Enum {
             ->value('MAILTO:attendee3@example.com')
             ->create()
         ])
-        ->dtstart(new Date('W. Europe Standard Time', '20160524T183000'))
-        ->dtend(new Date('W. Europe Standard Time', '20160524T190000'))
+        ->dtstart(new IDate('W. Europe Standard Time', '20160524T183000'))
+        ->dtend(new IDate('W. Europe Standard Time', '20160524T190000'))
         ->location(new Text('de-DE', 'BS 50 EG 0102'))
         ->comment(new Text('de-DE', "\n"))
         ->summary(new Text('de-DE', 'Treffen'))
@@ -106,7 +107,7 @@ class Fixtures extends \lang\Enum {
         END:VTIMEZONE
         END:VCALENDAR
       ',
-      Calendar::with()->timezone(new TimeZone(
+      Calendar::with()->timezones([new ITimeZone(
         'W. Europe Standard Time',
         TimeZoneInfo::with()
           ->dtstart('16010101T030000')
@@ -121,7 +122,7 @@ class Fixtures extends \lang\Enum {
           ->tzoffsetto('+0200')
           ->rrule('FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=3')
           ->create()
-      ))
+      )])
       ->create()
     );
 

@@ -1,5 +1,7 @@
 <?php namespace text\ical;
 
+use lang\IllegalStateException;
+use util\Date;
 use util\Objects;
 
 class Calendar implements IObject {
@@ -14,15 +16,15 @@ class Calendar implements IObject {
    * @param  string $prodid
    * @param  string $version
    * @param  text.ical.Event[] $events
-   * @param  text.ical.TimeZone $timezone
+   * @param  text.ical.ITimeZone[] $timezones
    * @param  [:string] $properties
    */
-  public function __construct($method, $prodid, $version, $events, $timezone, $properties= []) {
+  public function __construct($method, $prodid, $version, $events, $timezones, $properties= []) {
     $this->method= $method;
     $this->prodid= $prodid;
     $this->version= $version;
     $this->events= $events;
-    $this->timezone= $timezone;
+    $this->timezones= $timezones;
     $this->properties= $properties;
   }
 
@@ -35,8 +37,8 @@ class Calendar implements IObject {
   /** @return string */
   public function version() { return $this->version; }
 
-  /** @return text.ical.TimeZone */
-  public function timezone() { return $this->timezone; }
+  /** @return text.ical.ITimeZone[] */
+  public function timezones() { return $this->timezones; }
 
   /** @return text.ical.Events */
   public function events() { return new Events(...(array)$this->events); }
@@ -44,7 +46,7 @@ class Calendar implements IObject {
   /** @return object */
   public static function with() {
     return new class() {
-      private $method, $prodid, $version, $events, $timezone, $properties= [];
+      private $method, $prodid, $version, $events, $timezones, $properties= [];
 
       public function method($value) { $this->method= $value; return $this; }
 
@@ -52,16 +54,33 @@ class Calendar implements IObject {
 
       public function version($value) { $this->version= $value; return $this; }
 
-      public function timezone($value) { $this->timezone= $value; return $this; }
+      public function timezones($value) { $this->timezones= $value; return $this; }
 
       public function events($value) { $this->events= $value; return $this; }
 
       public function properties($value) { $this->properties= $value; return $this; }
 
       public function create() {
-        return new Calendar($this->method, $this->prodid, $this->version, $this->events, $this->timezone, $this->properties);
+        return new Calendar($this->method, $this->prodid, $this->version, $this->events, $this->timezones, $this->properties);
       }
     };
+  }
+
+  /**
+   * Converts a calendar date value to a date instance
+   *
+   * @param  text.ical.IDate $date
+   * @return util.Date
+   * @throws lang.IllegalStateException if the date's timezone is not defined
+   */
+  public function date(IDate $date) {
+    if (null === ($tzid= $date->tzid())) return new Date($date->value());
+
+    foreach ($this->timezones as $timezone) {
+      if ($tzid === $timezone->tzid()) return $timezone->convert($date->value());
+    }
+
+    throw new IllegalStateException('No timezone definition in calendar for "'.$tzid.'"');
   }
 
   /**
@@ -77,7 +96,7 @@ class Calendar implements IObject {
       'prodid'   => $this->prodid,
       'version'  => $this->version,
       'event'    => $this->events,
-      'timezone' => $this->timezone
+      'timezone' => $this->timezones
     ]));
   }
 

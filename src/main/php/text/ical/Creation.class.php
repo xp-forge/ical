@@ -8,7 +8,7 @@ class Creation {
   const CHECK = true;
 
   private static $definitions= [null, null, [
-    'calendar' => [Calendar::class, ['events' => 'event'], [
+    'calendar' => [Calendar::class, ['events' => 'event', 'timezones' => 'timezone'], [
       'event'      => [Event::class, ['attendees' => 'attendee'], [
         'organizer'   => [Organizer::class],
         'attendee'    => [Attendee::class],
@@ -16,14 +16,14 @@ class Creation {
         'description' => [Text::class],
         'comment'     => [Text::class],
         'location'    => [Text::class],
-        'dtstart'     => [Date::class],
-        'dtstamp'     => [Date::class],
-        'dtend'       => [Date::class],
+        'dtstart'     => [IDate::class],
+        'dtstamp'     => [IDate::class],
+        'dtend'       => [IDate::class],
         'alarm'       => [Alarm::class, null, [
           'trigger'     => [Trigger::class]
         ]]
       ]],
-      'timezone'   => [TimeZone::class, null, [
+      'timezone'   => [ITimeZone::class, null, [
         'standard'    => [TimeZoneInfo::class],
         'daylight'    => [TimeZoneInfo::class],
       ]],

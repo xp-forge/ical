@@ -1,0 +1,22 @@
+<?php namespace text\ical;
+
+module ical {
+
+  /**
+   * Ensures `text.ical.Date` and `text.ical.TimeZone` can be instantiated
+   * when imported; the classes now have an *I* prefix in order to work in
+   * conjunction with the classes from XP Framework Core - as we'd like to
+   * retain backwards compatibility we help ourselves with `class_alias()`.
+   *
+   * @return void
+   */
+  public function initialize() {
+    spl_autoload_register(function($class) {
+      switch ($class) {
+        case Date::class: return class_alias(IDate::class, Date::class);
+        case TimeZone::class: return class_alias(ITimeZone::class, TimeZone::class);
+        default: return false;
+      }
+    });
+  }
+}

@@ -1,8 +1,8 @@
 <?php namespace text\ical;
 
-use util\Objects;
+use util\{Date, Objects};
 
-class TimeZone implements IObject {
+class ITimeZone implements IObject {
   private $tzid, $standard, $daylight;
 
   /**
@@ -39,9 +39,29 @@ class TimeZone implements IObject {
       public function daylight($value) { $this->daylight= $value; return $this; }
 
       public function create() {
-        return new TimeZone($this->tzid, $this->standard, $this->daylight);
+        return new ITimeZone($this->tzid, $this->standard, $this->daylight);
       }
     };
+  }
+
+  /**
+   * Converts a date
+   *
+   * @param  string $input `YYYYMMDD"T"HHMMSS`
+   * @return util.Date
+   */
+  public function convert($input) {
+    $date= sscanf($input, '%4d%2d%2dT%2d%2d%d');
+
+    $rel= gmmktime($date[3], $date[4], $date[5], $date[1], $date[2], $date[0]);
+    $daylight= $this->daylight->start($date[0]);
+    $standard= $this->standard->start($date[0]);
+
+    if ($rel >= $standard + $this->standard->adjust() || $rel < $daylight + $this->daylight->adjust()) {
+      return new Date(gmdate('Y-m-d H:i:s'.$this->standard->tzoffsetto(), $rel));
+    } else {
+      return new Date(gmdate('Y-m-d H:i:s'.$this->daylight->tzoffsetto(), $rel));
+    }
   }
 
   /**

@@ -2,7 +2,7 @@
 
 use util\Objects;
 
-class Date implements IObject {
+class IDate implements IObject {
   private $tzid, $value;
 
   /**

@@ -14,9 +14,9 @@ class Event implements IObject {
    * @param  text.ical.Text $description
    * @param  text.ical.Text $summary
    * @param  text.ical.Text $comment
-   * @param  text.ical.Date $dtstart
-   * @param  text.ical.Date $dtend
-   * @param  text.ical.Date $dtstamp
+   * @param  text.ical.IDate $dtstart
+   * @param  text.ical.IDate $dtend
+   * @param  text.ical.IDate $dtstamp
    * @param  string $uid
    * @param  string $class
    * @param  string $priority
@@ -60,13 +60,13 @@ class Event implements IObject {
   /** @return text.ical.Text */
   public function comment() { return $this->comment; }
 
-  /** @return text.ical.Date */
+  /** @return text.ical.IDate */
   public function dtstart() { return $this->dtstart; }
 
-  /** @return text.ical.Date */
+  /** @return text.ical.IDate */
   public function dtend() { return $this->dtend; }
 
-  /** @return text.ical.Date */
+  /** @return text.ical.IDate */
   public function dtstamp() { return $this->dtstamp; }
 
   /** @return string */
