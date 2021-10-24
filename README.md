@@ -20,10 +20,10 @@ use io\File;
 $ical= new ICalendar();
 
 $calendar= $ical->read('BEGIN:VCALENDAR...');
-$calendar= $ical->read(Console::$in->getStream());
+$calendar= $ical->read(Console::$in->stream());
 $calendar= $ical->read(new File('meeting.ics'));
 
-$ical->write($calendar, Console::$out->getStream());
+$ical->write($calendar, Console::$out->stream());
 $ical->write($calendar, new File('meeting.ics'));
 ```
 
