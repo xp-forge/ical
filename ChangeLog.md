@@ -5,6 +5,7 @@ iCal ChangeLog
 
 ## 4.0.0 / 2021-10-24
 
+* Made library compatible with XP 11 - @thekid
 * Implemented xp-framework/rfc#341, dropping compatibility with XP 9
   (@thekid)
 * Merged PR #6: Remove dependency on xp-forge/partial library - @thekid
