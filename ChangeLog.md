@@ -5,6 +5,10 @@ iCal ChangeLog
 
 ## 4.0.0 / 2021-10-24
 
+* Merged PR #5: TimeZones, implementing feature request #4. This renames
+  the Date and TimeZone classes from text.ical to IDate and ITimeZone as
+  they will now be use in conjunction with the ones from XP Framework Core.
+  (@thekid)
 * Made library compatible with XP 11, PHP 8.1 - @thekid
 * Implemented xp-framework/rfc#341, dropping compatibility with XP 9
   (@thekid)
