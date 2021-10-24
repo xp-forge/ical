@@ -16,7 +16,7 @@ class Calendar implements IObject {
    * @param  string $prodid
    * @param  string $version
    * @param  text.ical.Event[] $events
-   * @param  text.ical.TimeZone[] $timezones
+   * @param  text.ical.ITimeZone[] $timezones
    * @param  [:string] $properties
    */
   public function __construct($method, $prodid, $version, $events, $timezones, $properties= []) {
@@ -37,7 +37,7 @@ class Calendar implements IObject {
   /** @return string */
   public function version() { return $this->version; }
 
-  /** @return text.ical.TimeZone[] */
+  /** @return text.ical.ITimeZone[] */
   public function timezones() { return $this->timezones; }
 
   /** @return text.ical.Events */

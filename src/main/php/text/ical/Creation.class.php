@@ -23,7 +23,7 @@ class Creation {
           'trigger'     => [Trigger::class]
         ]]
       ]],
-      'timezone'   => [TimeZone::class, null, [
+      'timezone'   => [ITimeZone::class, null, [
         'standard'    => [TimeZoneInfo::class],
         'daylight'    => [TimeZoneInfo::class],
       ]],

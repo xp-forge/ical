@@ -2,7 +2,7 @@
 
 use util\{Date, Objects};
 
-class TimeZone implements IObject {
+class ITimeZone implements IObject {
   private $tzid, $standard, $daylight;
 
   /**
@@ -39,7 +39,7 @@ class TimeZone implements IObject {
       public function daylight($value) { $this->daylight= $value; return $this; }
 
       public function create() {
-        return new TimeZone($this->tzid, $this->standard, $this->daylight);
+        return new ITimeZone($this->tzid, $this->standard, $this->daylight);
       }
     };
   }

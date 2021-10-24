@@ -1,7 +1,7 @@
 <?php namespace text\ical\unittest;
 
 use lang\Enum;
-use text\ical\{Alarm, Attendee, Calendar, IDate, Event, Organizer, Text, TimeZone, TimeZoneInfo, Trigger};
+use text\ical\{Alarm, Attendee, Calendar, IDate, Event, Organizer, Text, ITimeZone, TimeZoneInfo, Trigger};
 
 class Fixtures extends Enum {
   public static $calendar, $event, $timezone, $alarm, $quoting, $properties;
@@ -107,7 +107,7 @@ class Fixtures extends Enum {
         END:VTIMEZONE
         END:VCALENDAR
       ',
-      Calendar::with()->timezones([new TimeZone(
+      Calendar::with()->timezones([new ITimeZone(
         'W. Europe Standard Time',
         TimeZoneInfo::with()
           ->dtstart('16010101T030000')
