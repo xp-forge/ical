@@ -1,7 +1,7 @@
 <?php namespace text\ical;
 
 use lang\FormatException;
-use lang\mirrors\TypeMirror;
+use lang\Reflection;
 
 class Creation {
   const ROOT = '';
@@ -47,7 +47,7 @@ class Creation {
     } else if (null === $definitions[0]) {
       $this->create= function() { return null; };
     } else {
-      $constructor= (new TypeMirror($definitions[0]))->constructor();
+      $constructor= Reflection::of($definitions[0])->constructor();
       foreach ($constructor->parameters() as $parameter) {
         $name= $parameter->name();
         if (isset($definitions[1][$name])) {
@@ -55,11 +55,11 @@ class Creation {
         } else {
           $this->access[$name]= false;
         }
-        $this->members[$name]= null;
+        $this->members[$name]= $parameter->optional() ? $parameter->default() : null;
       }
 
       $this->create= function() use($constructor) {
-        return $constructor->newInstance(...array_values($this->members));
+        return $constructor->newInstance(array_values($this->members));
       };
     }
 
@@ -122,7 +122,7 @@ class Creation {
    *
    * @return var
    */
-  public function create() { return $this->create->__invoke(); }
+  public function create() { return ($this->create)(); }
 
   /**
    * Close creation

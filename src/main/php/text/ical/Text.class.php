@@ -1,18 +1,42 @@
 <?php namespace text\ical;
 
-use lang\partial\{Builder, Value};
+use util\Objects;
 
 class Text implements IObject {
-  use Text\is\Value;
-  use Text\with\Builder;
-
   private static $ESCAPING = ["\n" => '\n', ',' => '\,', ';' => '\;', '\\' => '\\\\'];
+  private $language, $value;
 
-  /** @type string */
-  private $language;
+  /**
+   * Constructor
+   *
+   * @param string $language
+   * @param string $value
+   */
+  public function __construct($language, $value) {
+    $this->language= $language;
+    $this->value= $value;
+  }
 
-  /** @type string */
-  private $value;
+  /** @return string */
+  public function language() { return $this->language; }
+
+  /** @return string */
+  public function value() { return $this->value; }
+
+  /** @return object */
+  public static function with() {
+    return new class() {
+      private $language, $value;
+
+      public function language($value) { $this->language= $value; return $this; }
+
+      public function value($value) { $this->value= $value; return $this; }
+
+      public function create() {
+        return new Text($this->language, $this->value);
+      }
+    };
+  }
 
   /**
    * Write this object
@@ -23,5 +47,21 @@ class Text implements IObject {
    */
   public function write($out, $name) {
     $out->pair($name, ['language' => $this->language], strtr($this->value, self::$ESCAPING));
+  }
+
+  /** @return string */
+  public function hashCode() { return Objects::hashOf((array)$this); }
+
+  /** @return string */
+  public function toString() { return nameof($this).'@'.Objects::stringOf(get_object_vars($this)); }
+
+  /**
+   * Compare
+   *
+   * @param  var $value
+   * @return int
+   */
+  public function compareTo($value) {
+    return $value instanceof self ? Objects::compare((array)$this, (array)$value) : 1;
   }
 }

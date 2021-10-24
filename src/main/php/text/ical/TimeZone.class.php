@@ -1,19 +1,48 @@
 <?php namespace text\ical;
 
-use lang\partial\{Builder, Value};
+use util\Objects;
 
 class TimeZone implements IObject {
-  use TimeZone\is\Value;
-  use TimeZone\with\Builder;
+  private $tzid, $standard, $daylight;
 
-  /** @type string */
-  private $tzid;
+  /**
+   * Constructor
+   *
+   * @param string $tzid
+   * @param text.ical.TimeZoneInfo $standard
+   * @param text.ical.TimeZoneInfo $daylight
+   */
+  public function __construct($tzid, $standard, $daylight) {
+    $this->tzid= $tzid;
+    $this->standard= $standard;
+    $this->daylight= $daylight;
+  }
 
-  /** @type text.ical.TimeZoneInfo */
-  private $standard;
+  /** @return string */
+  public function tzid() { return $this->tzid; }
 
-  /** @type text.ical.TimeZoneInfo */
-  private $daylight;
+  /** @return text.ical.TimeZoneInfo */
+  public function standard() { return $this->standard; }
+
+  /** @return text.ical.TimeZoneInfo */
+  public function daylight() { return $this->daylight; }
+
+  /** @return object */
+  public static function with() {
+    return new class() {
+      private $tzid, $standard, $daylight, $properties= [];
+
+      public function tzid($value) { $this->tzid= $value; return $this; }
+
+      public function standard($value) { $this->standard= $value; return $this; }
+
+      public function daylight($value) { $this->daylight= $value; return $this; }
+
+      public function create() {
+        return new TimeZone($this->tzid, $this->standard, $this->daylight);
+      }
+    };
+  }
 
   /**
    * Write this object
@@ -28,5 +57,21 @@ class TimeZone implements IObject {
       'standard' => $this->standard,
       'daylight' => $this->daylight
     ]);
+  }
+
+  /** @return string */
+  public function hashCode() { return Objects::hashOf((array)$this); }
+
+  /** @return string */
+  public function toString() { return nameof($this).'@'.Objects::stringOf(get_object_vars($this)); }
+
+  /**
+   * Compare
+   *
+   * @param  var $value
+   * @return int
+   */
+  public function compareTo($value) {
+    return $value instanceof self ? Objects::compare((array)$this, (array)$value) : 1;
   }
 }
