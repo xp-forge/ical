@@ -55,7 +55,7 @@ class Creation {
         } else {
           $this->access[$name]= false;
         }
-        $this->members[$name]= null;
+        $this->members[$name]= $parameter->isOptional() ? $parameter->defaultValue() : null;
       }
 
       $this->create= function() use($constructor) {

@@ -1,6 +1,10 @@
 <?php namespace text\ical;
 
 trait Properties {
+  private $properties= [];
+
+  /** @return [:string] */
+  public function properties() { return $this->properties; }
 
   /**
    * Returns a named property
