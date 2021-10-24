@@ -63,7 +63,7 @@ use text\ical\{
   Event,
   Organizer,
   Attendee,
-  Date,
+  IDate,
   Text,
   Method,
   Role,
@@ -93,8 +93,8 @@ $calendar= Calendar::with()
         ->value('MAILTO:attendee3@example.com')
         ->create()
     ])
-    ->dtstart(new Date(null, '20160524T183000Z'))
-    ->dtend(new Date(null, '20160524T190000Z'))
+    ->dtstart(new IDate(null, '20160524T183000Z'))
+    ->dtend(new IDate(null, '20160524T190000Z'))
     ->location(new Text('de-DE', 'BS 50 EG 0102'))
     ->summary(new Text('de-DE', 'Treffen'))
     ->create()
