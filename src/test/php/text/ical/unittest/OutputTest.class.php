@@ -18,7 +18,7 @@ class OutputTest extends TestCase {
     $out= new MemoryOutputStream();
     $test(new Output(new TextWriter($out)));
 
-    $bytes= $out->getBytes();
+    $bytes= $out->bytes();
     if ($expected !== $bytes) {
       $this->fail('===', new Bytes($bytes), new Bytes($expected));
     }

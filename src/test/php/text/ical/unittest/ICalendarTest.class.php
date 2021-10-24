@@ -29,7 +29,7 @@ class ICalendarTest extends \unittest\TestCase {
     $out= new MemoryOutputStream();
     (new ICalendar())->write($fixture->object(), $out);
 
-    $this->assertEquals($fixture->string(), trim($out->getBytes()));
+    $this->assertEquals($fixture->string(), trim($out->bytes()));
   }
 
   #[Test, Expect(FormatException::class), Values(["BEGIN:VCALENDAR", "BEGIN:VCALENDAR\nBEGIN:VEVENT\nEND:VCALENDAR", "BEGIN:VCALENDAR\nBEGIN:VEVENT\nEND:VEVENT"])]
