@@ -3,6 +3,10 @@ iCal ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 4.0.1 / 2022-02-27
+
+* Fixed "Creation of dynamic property" warnings in PHP 8.2 - @thekid
+
 ## 4.0.0 / 2021-10-24
 
 * Merged PR #5: TimeZones, implementing feature request #4. This renames

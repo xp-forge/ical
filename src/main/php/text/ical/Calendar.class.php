@@ -7,7 +7,7 @@ use util\Objects;
 class Calendar implements IObject {
   use Properties;
 
-  private $method, $prodid, $version, $events, $timezone;
+  private $method, $prodid, $version, $events, $timezones;
 
   /**
    * Creates a new calendar instance
