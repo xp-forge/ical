@@ -192,8 +192,8 @@ class ICalendarTest extends \unittest\TestCase {
     $this->assertEquals(new Date('1997-07-14 17:30:00 GMT'), $calendar->date($calendar->events()->first()->dtstart()));
   }
 
-  #[Test]
-  public function convert_date_with_timezone() {
+  #[Test, Values([['19970714T193000', 'local time'], ['19970714T173000Z', 'UTC time']])]
+  public function convert_date_with_timezone($date, $remark) {
     $calendar= (new ICalendar())->read(
       "BEGIN:VCALENDAR\r\n".
       "BEGIN:VTIMEZONE\r\n".
@@ -212,10 +212,14 @@ class ICalendarTest extends \unittest\TestCase {
       "END:DAYLIGHT\r\n".
       "END:VTIMEZONE\r\n".
       "BEGIN:VEVENT\r\n".
-      "DTSTART;TZID=W. Europe Standard Time:19970714T173000Z\r\n".
+      "DTSTART;TZID=W. Europe Standard Time:".$date."\r\n".
       "END:VEVENT\r\n".
       "END:VCALENDAR"
     );
-    $this->assertEquals(new Date('1997-07-14 17:30:00 Europe/Berlin'), $calendar->date($calendar->events()->first()->dtstart()));
+    $this->assertEquals(
+      new Date('1997-07-14 19:30:00 Europe/Berlin'),
+      $calendar->date($calendar->events()->first()->dtstart()),
+      $remark
+    );
   }
 }

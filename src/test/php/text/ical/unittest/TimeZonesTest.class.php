@@ -31,35 +31,67 @@ class TimeZonesTest extends TestCase {
 
   /** @return iterable */
   private function europeBerlin() {
-    yield ['20180101T000000', '2018-01-01 00:00:00 Europe/Berlin', 'Standard'];
-    yield ['20180330T192800', '2018-03-30 19:28:00 Europe/Berlin', 'Daylight'];
-    yield ['20180325T015959', '2018-03-25 01:59:59 Europe/Berlin', 'One second before transition to daylight'];
-    yield ['20180325T020000', '2018-03-25 03:00:00 Europe/Berlin', 'Transition to daylight'];
-    yield ['20180325T020001', '2018-03-25 03:00:01 Europe/Berlin', 'One second after transition to daylight'];
-    yield ['20180325T030001', '2018-03-25 03:00:01 Europe/Berlin', 'One second after transition to daylight'];
-    yield ['20181028T025959', '2018-10-28 02:59:59 Europe/Berlin', 'One second before transition to standard'];
-    yield ['20181028T030000', '2018-10-28 03:00:00 Europe/Berlin', 'Transition to standard'];
-    yield ['20181028T030001', '2018-10-28 03:00:01 Europe/Berlin', 'One second after transition to standard'];
+    yield ['20180101T000000', '2018-01-01 00:00:00 Europe/Berlin'];
+    yield ['20180330T192800', '2018-03-30 19:28:00 Europe/Berlin'];
   }
 
   /** @return iterable */
   private function americaNY() {
-    yield ['20180101T000000', '2018-01-01 00:00:00 America/New_York', 'Standard'];
-    yield ['20180401T115500', '2018-04-01 11:55:00 America/New_York', 'Daylight'];
-    yield ['20180311T015959', '2018-03-11 01:59:59 America/New_York', 'One second before transition to daylight'];
-    yield ['20180311T020000', '2018-03-11 03:00:00 America/New_York', 'Transition to daylight'];
-    yield ['20180311T020001', '2018-03-11 03:00:01 America/New_York', 'One second after transition to daylight'];
-    yield ['20180311T030001', '2018-03-11 03:00:01 America/New_York', 'One second after transition to daylight'];
-    yield ['20181104T025959', '2018-11-04 02:59:59 America/New_York', 'One second before transition to standard'];
-    yield ['20181104T030000', '2018-11-04 03:00:00 America/New_York', 'Transition to standard'];
-    yield ['20181104T030001', '2018-11-04 03:00:01 America/New_York', 'One second after transition to standard'];
+    yield ['20180101T000000', '2018-01-01 00:00:00 America/New_York'];
+    yield ['20180401T115500', '2018-04-01 11:55:00 America/New_York'];
   }
 
   /** @return iterable */
   private function europeParis() {
-    yield ['20070101T000000', '2007-01-01 00:00:00 Europe/Paris', 'Standard'];
-    yield ['20061029T020000', '2006-10-29 02:00:00 Europe/Paris', 'Standard'];
-    yield ['20070325T020000', '2007-03-25 02:00:00 Europe/Paris', 'Daylight'];
+    yield ['20070101T000000', '2007-01-01 00:00:00 Europe/Paris'];
+    yield ['20061029T030000', '2006-10-29 03:00:00 Europe/Paris'];
+    yield ['20070325T040000', '2007-03-25 04:00:00 Europe/Paris'];
+  }
+
+  /**
+   * Handle standard to daylight savings time transitions
+   * 
+   * @see    https://www.nist.gov/pml/time-and-frequency-division/popular-links/daylight-saving-time-dst
+   * @see    https://www.rfc-editor.org/rfc/rfc5545#section-3.3.5
+   * @see    https://tc39.es/proposal-temporal/docs/ambiguity.html
+   * @return iterable
+   */
+  private function transitions() {
+
+    // Transition from standard to daylight savings time
+    // Wall clock goes 01:59:59 EST -> 03:00:00 EDT
+    yield ['20070311T015959', '2007-03-11 01:59:59 EST', 'One second before transition to daylight'];
+    yield ['20070311T020000', '2007-03-11 03:00:00 EDT', 'Transition to daylight'];
+    yield ['20070311T030001', '2007-03-11 03:00:01 EDT', 'One second after transition to daylight'];
+
+    // If the local time described does not occur (when
+    // changing from standard to daylight time), the DATE-TIME value is
+    // interpreted using the UTC offset before the gap in local times.
+    // Thus, TZID=America/New_York:20070311T023000 indicates March 11,
+    // 2007 at 3:30 A.M. EDT (UTC-04:00), one hour after 1:30 A.M. EST
+    // (UTC-05:00).
+    yield ['20070311T023000', '2007-03-11 03:30:00 EDT', 'Local time does not occur'];
+
+    // Transition from daylight savings to standard time
+    // Wall clock goes 01:59:59 EDT -> 01:00:00 EST.
+    yield ['20071104T015959', '2007-11-04 01:59:59 EDT', 'One second before transition to standard'];
+    yield ['20071104T020000', '2007-11-04 02:00:00 EST', 'One hour after transition to standard'];
+    yield ['20071104T020001', '2007-11-04 02:00:01 EST', 'One hour and one second after transition to standard'];
+
+    // If, based on the definition of the referenced time zone, the local
+    // time described occurs more than once (when changing from daylight
+    // to standard time), the DATE-TIME value refers to the first
+    // occurrence of the referenced time.  Thus, TZID=America/
+    // New_York:20071104T013000 indicates November 4, 2007 at 1:30 A.M.
+    // EDT (UTC-04:00).
+    yield ['20071104T013000', '2007-11-04 01:30:00 EDT', 'Local time occurs more than once'];
+
+    // This means there is no way to reference the repeated hour (01:00:00
+    // EST until 02:00:00 EST) in local time; we need to use UTC instead.
+    yield ['20071104T055959Z', '2007-11-04 01:59:59 EDT', 'One second before transition to standard'];
+    yield ['20071104T060000Z', '2007-11-04 01:00:00 EST', 'Transition to standard'];
+    yield ['20071104T060001Z', '2007-11-04 01:00:01 EST', 'One second after transition to standard'];
+    yield ['20071104T070000Z', '2007-11-04 02:00:00 EST', 'One hour after transition to standard'];
   }
 
   #[Test, Values('europeBerlin')]
@@ -87,25 +119,25 @@ class TimeZonesTest extends TestCase {
   #[Test, Values('americaNY')]
   public function new_york_time_with_rrule($input, $expected) {
     $tz= $this->parse('
-     BEGIN:VTIMEZONE
-     TZID:America/New_York
-     LAST-MODIFIED:20050809T050000Z
-     TZURL:http://zones.example.com/tz/America-New_York.ics
-     BEGIN:STANDARD
-     DTSTART:20071104T020000
-     RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
-     TZOFFSETFROM:-0400
-     TZOFFSETTO:-0500
-     TZNAME:EST
-     END:STANDARD
-     BEGIN:DAYLIGHT
-     DTSTART:20070311T020000
-     RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
-     TZOFFSETFROM:-0500
-     TZOFFSETTO:-0400
-     TZNAME:EDT
-     END:DAYLIGHT
-     END:VTIMEZONE
+      BEGIN:VTIMEZONE
+      TZID:America/New_York
+      LAST-MODIFIED:20050809T050000Z
+      TZURL:http://zones.example.com/tz/America-New_York.ics
+      BEGIN:STANDARD
+      DTSTART:20071104T020000
+      RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
+      TZOFFSETFROM:-0400
+      TZOFFSETTO:-0500
+      TZNAME:EST
+      END:STANDARD
+      BEGIN:DAYLIGHT
+      DTSTART:20070311T020000
+      RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
+      TZOFFSETFROM:-0500
+      TZOFFSETTO:-0400
+      TZNAME:EDT
+      END:DAYLIGHT
+      END:VTIMEZONE
     ');
     $this->assertEquals(new Date($expected), $tz->convert($input));
   }
@@ -127,6 +159,32 @@ class TimeZonesTest extends TestCase {
       TZOFFSETTO:+0200
       TZOFFSETFROM:+0100
       TZNAME:CEST
+      END:DAYLIGHT
+      END:VTIMEZONE
+    ');
+    $this->assertEquals(new Date($expected), $tz->convert($input));
+  }
+
+  #[Test, Values('transitions')]
+  public function local_date_transitions($input, $expected) {
+    $tz= $this->parse('
+      BEGIN:VTIMEZONE
+      TZID:America/New_York
+      LAST-MODIFIED:20050809T050000Z
+      TZURL:http://zones.example.com/tz/America-New_York.ics
+      BEGIN:STANDARD
+      DTSTART:20071104T020000
+      RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
+      TZOFFSETFROM:-0400
+      TZOFFSETTO:-0500
+      TZNAME:EST
+      END:STANDARD
+      BEGIN:DAYLIGHT
+      DTSTART:20070311T020000
+      RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
+      TZOFFSETFROM:-0500
+      TZOFFSETTO:-0400
+      TZNAME:EDT
       END:DAYLIGHT
       END:VTIMEZONE
     ');
