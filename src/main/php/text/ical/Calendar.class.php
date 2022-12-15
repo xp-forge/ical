@@ -1,7 +1,7 @@
 <?php namespace text\ical;
 
 use lang\IllegalStateException;
-use util\{Date, Objects, TimeZone};
+use util\{Date, Objects};
 
 class Calendar implements IObject {
   use Properties;
