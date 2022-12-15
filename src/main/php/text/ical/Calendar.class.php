@@ -1,8 +1,7 @@
 <?php namespace text\ical;
 
 use lang\IllegalStateException;
-use util\Date;
-use util\Objects;
+use util\{Date, Objects, TimeZone};
 
 class Calendar implements IObject {
   use Properties;
@@ -72,9 +71,19 @@ class Calendar implements IObject {
    * @param  text.ical.IDate $date
    * @return util.Date
    * @throws lang.IllegalStateException if the date's timezone is not defined
+   * @see    https://www.rfc-editor.org/rfc/rfc5545#section-3.8.3.1
    */
   public function date(IDate $date) {
     if (null === ($tzid= $date->tzid())) return new Date($date->value());
+
+    // The presence of the SOLIDUS character as a prefix, indicates that this
+    // "TZID" represents an unique ID in a globally defined time zone registry
+    // (when such registry is defined). [...] Implementers may want to use the
+    // naming conventions defined in existing time zone specifications such
+    // as the public-domain TZ database.
+    if ('/' === $tzid[0]) {
+      return TimeZone::getByName(substr($tzid, 1))->translate(new Date($date->value()));
+    }
 
     foreach ($this->timezones as $timezone) {
       if ($tzid === $timezone->tzid()) return $timezone->convert($date->value());
