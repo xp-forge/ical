@@ -12,13 +12,29 @@ class TimeZoneInfo implements IObject {
    * @param string $dtstart
    * @param string $tzoffsetfrom
    * @param string $tzoffsetto
-   * @param string $rrule
+   * @param ?string $rrule
    */
-  public function __construct($dtstart, $tzoffsetfrom, $tzoffsetto, $rrule) {
+  public function __construct($dtstart, $tzoffsetfrom, $tzoffsetto, $rrule= null) {
     $this->dtstart= $dtstart;
     $this->tzoffsetfrom= $tzoffsetfrom;
     $this->tzoffsetto= $tzoffsetto;
     $this->rrule= $rrule;
+  }
+
+  /**
+   * Creates an instance from a time transition
+   * 
+   * @param  int $ts Timestamp for the transition
+   * @param  int $from UTC offset from
+   * @param  int $to UTC offset to
+   * @return self
+   */
+  public static function transition($ts, $from, $to): self {
+    return new self(
+      gmdate('Ymd\THis', $ts + $from - $to),
+      sprintf('%s%02d:%02d', $from < 0 ? '-' : '+', abs($from / 3600), abs($from % 3600) / 60),
+      sprintf('%s%02d:%02d', $to < 0 ? '-' : '+', abs($to / 3600), abs($to % 3600) / 60),
+    );
   }
 
   /** @return string */

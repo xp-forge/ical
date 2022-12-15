@@ -82,9 +82,10 @@ class Calendar implements IObject {
     // naming conventions defined in existing time zone specifications such
     // as the public-domain TZ database.
     if ('/' === $tzid[0]) {
-      return TimeZone::getByName(substr($tzid, 1))->translate(new Date($date->value()));
+      return ITimeZone::named(substr($tzid, 1))->convert($date->value());
     }
 
+    // Otherwise, search for a time zone definition
     foreach ($this->timezones as $timezone) {
       if ($tzid === $timezone->tzid()) return $timezone->convert($date->value());
     }
