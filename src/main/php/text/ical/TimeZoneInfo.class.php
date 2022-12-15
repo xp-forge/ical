@@ -33,7 +33,7 @@ class TimeZoneInfo implements IObject {
     return new self(
       gmdate('Ymd\THis', $ts + $from - $to),
       sprintf('%s%02d:%02d', $from < 0 ? '-' : '+', abs($from / 3600), abs($from % 3600) / 60),
-      sprintf('%s%02d:%02d', $to < 0 ? '-' : '+', abs($to / 3600), abs($to % 3600) / 60),
+      sprintf('%s%02d:%02d', $to < 0 ? '-' : '+', abs($to / 3600), abs($to % 3600) / 60)
     );
   }
 
