@@ -3,6 +3,11 @@ iCal ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 4.1.0 / 2022-12-17
+
+* Merged PR #8: Implement global timezone identifiers - @thekid
+* Fixed issue #7: Tests failing with PHP 8.1+ - @thekid
+
 ## 4.0.1 / 2022-02-27
 
 * Fixed "Creation of dynamic property" warnings in PHP 8.2 - @thekid
