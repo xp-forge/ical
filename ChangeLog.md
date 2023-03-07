@@ -3,6 +3,8 @@ iCal ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #9: Migrate to new testing library - @thekid
+
 ## 4.1.0 / 2022-12-17
 
 * Merged PR #8: Implement global timezone identifiers - @thekid
