@@ -1,10 +1,11 @@
 <?php namespace text\ical\unittest;
 
 use text\ical\ICalendar;
-use unittest\{Test, BeforeClass, AfterClass, Values, TestCase};
+use test\Assert;
+use test\{AfterClass, BeforeClass, Test, TestCase, Values};
 use util\Date;
 
-class TimeZonesTest extends TestCase {
+class TimeZonesTest {
   private static $tz;
 
   #[BeforeClass]
@@ -94,7 +95,7 @@ class TimeZonesTest extends TestCase {
     yield ['20071104T070000Z', '2007-11-04 02:00:00 EST', 'One hour after transition to standard'];
   }
 
-  #[Test, Values('europeBerlin')]
+  #[Test, Values(from: 'europeBerlin')]
   public function west_europe_standard_time_with_rrule($input, $expected) {
     $tz= $this->parse('
       BEGIN:VTIMEZONE
@@ -113,10 +114,10 @@ class TimeZonesTest extends TestCase {
       END:DAYLIGHT
       END:VTIMEZONE
     ');
-    $this->assertEquals(new Date($expected), $tz->convert($input));
+    Assert::equals(new Date($expected), $tz->convert($input));
   }
 
-  #[Test, Values('americaNY')]
+  #[Test, Values(from: 'americaNY')]
   public function new_york_time_with_rrule($input, $expected) {
     $tz= $this->parse('
       BEGIN:VTIMEZONE
@@ -139,10 +140,10 @@ class TimeZonesTest extends TestCase {
       END:DAYLIGHT
       END:VTIMEZONE
     ');
-    $this->assertEquals(new Date($expected), $tz->convert($input));
+    Assert::equals(new Date($expected), $tz->convert($input));
   }
 
-  #[Test, Values('europeParis')]
+  #[Test, Values(from: 'europeParis')]
   public function europe_paris_without_rrule($input, $expected) {
     $tz= $this->parse('
       BEGIN:VTIMEZONE
@@ -162,10 +163,10 @@ class TimeZonesTest extends TestCase {
       END:DAYLIGHT
       END:VTIMEZONE
     ');
-    $this->assertEquals(new Date($expected), $tz->convert($input));
+    Assert::equals(new Date($expected), $tz->convert($input));
   }
 
-  #[Test, Values('transitions')]
+  #[Test, Values(from: 'transitions')]
   public function local_date_transitions($input, $expected) {
     $tz= $this->parse('
       BEGIN:VTIMEZONE
@@ -188,6 +189,6 @@ class TimeZonesTest extends TestCase {
       END:DAYLIGHT
       END:VTIMEZONE
     ');
-    $this->assertEquals(new Date($expected), $tz->convert($input));
+    Assert::equals(new Date($expected), $tz->convert($input));
   }
 }

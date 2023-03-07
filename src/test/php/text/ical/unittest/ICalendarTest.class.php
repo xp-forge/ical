@@ -3,10 +3,11 @@
 use io\streams\MemoryOutputStream;
 use lang\{ElementNotFoundException, FormatException};
 use text\ical\ICalendar;
-use unittest\{Expect, Test, Values};
+use test\Assert;
+use test\{Expect, Test, Values};
 use util\Date;
 
-class ICalendarTest extends \unittest\TestCase {
+class ICalendarTest {
 
   /** @return iterable */
   private function fixtures() {
@@ -20,17 +21,17 @@ class ICalendarTest extends \unittest\TestCase {
     new ICalendar();
   }
 
-  #[Test, Values('fixtures')]
+  #[Test, Values(from: 'fixtures')]
   public function read($fixture) {
-    $this->assertEquals($fixture->object(), (new ICalendar())->read($fixture->string()));
+    Assert::equals($fixture->object(), (new ICalendar())->read($fixture->string()));
   }
 
-  #[Test, Values('fixtures')]
+  #[Test, Values(from: 'fixtures')]
   public function write($fixture) {
     $out= new MemoryOutputStream();
     (new ICalendar())->write($fixture->object(), $out);
 
-    $this->assertEquals($fixture->string(), trim($out->bytes()));
+    Assert::equals($fixture->string(), trim($out->bytes()));
   }
 
   #[Test, Expect(FormatException::class), Values(["BEGIN:VCALENDAR", "BEGIN:VCALENDAR\nBEGIN:VEVENT\nEND:VCALENDAR", "BEGIN:VCALENDAR\nBEGIN:VEVENT\nEND:VEVENT"])]
@@ -38,42 +39,42 @@ class ICalendarTest extends \unittest\TestCase {
     (new ICalendar())->read($input);
   }
 
-  #[Test, Expect(class: FormatException::class, withMessage: 'No object type at root level')]
+  #[Test, Expect(class: FormatException::class, message: 'No object type at root level')]
   public function empty_input_raises_exception() {
     (new ICalendar())->read("");
   }
 
-  #[Test, Expect(class: FormatException::class, withMessage: 'No object type at root level')]
+  #[Test, Expect(class: FormatException::class, message: 'No object type at root level')]
   public function property_at_root_level_raises_exception() {
     (new ICalendar())->read("SUMMARY;LANGUAGE=de-DE:Test 1");
   }
 
-  #[Test, Expect(class: FormatException::class, withMessage: 'Unknown object type "event" at root level')]
+  #[Test, Expect(class: FormatException::class, message: 'Unknown object type "event" at root level')]
   public function root_object_must_be_calendar() {
     (new ICalendar())->read("BEGIN:VEVENT");
   }
 
-  #[Test, Expect(class: FormatException::class, withMessage: 'Unknown object type "calendar" inside "calendar"')]
+  #[Test, Expect(class: FormatException::class, message: 'Unknown object type "calendar" inside "calendar"')]
   public function cannot_nest_calendars() {
     (new ICalendar())->read("BEGIN:VCALENDAR\r\nBEGIN:VCALENDAR");
   }
 
-  #[Test, Expect(class: FormatException::class, withMessage: 'Unknown object type "unknown" inside "calendar"')]
+  #[Test, Expect(class: FormatException::class, message: 'Unknown object type "unknown" inside "calendar"')]
   public function unknown_object_inside_calendar() {
     (new ICalendar())->read("BEGIN:VCALENDAR\r\nBEGIN:UNKNOWN");
   }
 
-  #[Test, Expect(class: FormatException::class, withMessage: 'Unknown object type "unknown" inside "event"')]
+  #[Test, Expect(class: FormatException::class, message: 'Unknown object type "unknown" inside "event"')]
   public function unknown_object_inside_calendar_event() {
     (new ICalendar())->read("BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nBEGIN:UNKNOWN");
   }
 
-  #[Test, Expect(class: FormatException::class, withMessage: 'Illegal nesting of "unknown" inside "calendar"')]
+  #[Test, Expect(class: FormatException::class, message: 'Illegal nesting of "unknown" inside "calendar"')]
   public function illegal_nesting() {
     (new ICalendar())->read("BEGIN:VCALENDAR\r\nEND:UNKNOWN");
   }
 
-  #[Test, Expect(class: FormatException::class, withMessage: 'Illegal nesting of "calendar" at root level')]
+  #[Test, Expect(class: FormatException::class, message: 'Illegal nesting of "calendar" at root level')]
   public function end_before_begin() {
     (new ICalendar())->read("END:VCALENDAR");
   }
@@ -81,13 +82,13 @@ class ICalendarTest extends \unittest\TestCase {
   #[Test]
   public function no_events_present() {
     $calendar= (new ICalendar())->read("BEGIN:VCALENDAR\r\nEND:VCALENDAR");
-    $this->assertFalse($calendar->events()->present());
+    Assert::false($calendar->events()->present());
   }
 
   #[Test, Expect(ElementNotFoundException::class)]
   public function no_events_first() {
     $calendar= (new ICalendar())->read("BEGIN:VCALENDAR\r\nEND:VCALENDAR");
-    $this->assertFalse($calendar->events()->first());
+    Assert::false($calendar->events()->first());
   }
 
   #[Test]
@@ -99,7 +100,7 @@ class ICalendarTest extends \unittest\TestCase {
       "END:VEVENT\r\n".
       "END:VCALENDAR"
     );
-    $this->assertTrue($calendar->events()->present());
+    Assert::true($calendar->events()->present());
   }
 
   #[Test]
@@ -114,7 +115,7 @@ class ICalendarTest extends \unittest\TestCase {
       "END:VEVENT\r\n".
       "END:VCALENDAR"
     );
-    $this->assertEquals(['Test 1', 'Test 2'], array_map(
+    Assert::equals(['Test 1', 'Test 2'], array_map(
       function($event) { return $event->summary()->value(); },
       iterator_to_array($calendar->events())
     ));
@@ -129,7 +130,7 @@ class ICalendarTest extends \unittest\TestCase {
       "END:VEVENT\r\n".
       "END:VCALENDAR"
     );
-    $this->assertEquals('FALSE', $calendar->events()->first()->property('X-MICROSOFT-DISALLOW-COUNTER'));
+    Assert::equals('FALSE', $calendar->events()->first()->property('X-MICROSOFT-DISALLOW-COUNTER'));
   }
 
   #[Test]
@@ -141,7 +142,7 @@ class ICalendarTest extends \unittest\TestCase {
       "END:VEVENT\r\n".
       "END:VCALENDAR"
     );
-    $this->assertEquals('19970714T173000Z', $calendar->events()->first()->dtstart()->value());
+    Assert::equals('19970714T173000Z', $calendar->events()->first()->dtstart()->value());
   }
 
   #[Test, Values([' ', "\t"])]
@@ -153,7 +154,7 @@ class ICalendarTest extends \unittest\TestCase {
       "END:VEVENT\r\n".
       "END:VCALENDAR"
     );
-    $this->assertEquals('Test', $calendar->events()->first()->summary()->value());
+    Assert::equals('Test', $calendar->events()->first()->summary()->value());
   }
 
   #[Test, Values(['\n', '\N'])]
@@ -165,7 +166,7 @@ class ICalendarTest extends \unittest\TestCase {
       "END:VEVENT\r\n".
       "END:VCALENDAR"
     );
-    $this->assertEquals("\n", $calendar->events()->first()->summary()->value());
+    Assert::equals("\n", $calendar->events()->first()->summary()->value());
   }
 
   #[Test]
@@ -177,7 +178,7 @@ class ICalendarTest extends \unittest\TestCase {
       "END:VEVENT\r\n".
       "END:VCALENDAR"
     );
-    $this->assertEquals("BS50, 1303; coolest room\\on earth\n", $calendar->events()->first()->summary()->value());
+    Assert::equals("BS50, 1303; coolest room\\on earth\n", $calendar->events()->first()->summary()->value());
   }
 
   #[Test]
@@ -189,7 +190,7 @@ class ICalendarTest extends \unittest\TestCase {
       "END:VEVENT\r\n".
       "END:VCALENDAR"
     );
-    $this->assertEquals(new Date('1997-07-14 17:30:00 GMT'), $calendar->date($calendar->events()->first()->dtstart()));
+    Assert::equals(new Date('1997-07-14 17:30:00 GMT'), $calendar->date($calendar->events()->first()->dtstart()));
   }
 
   #[Test, Values([['19970714T193000', 'local time'], ['19970714T173000Z', 'UTC time']])]
@@ -201,7 +202,7 @@ class ICalendarTest extends \unittest\TestCase {
       "END:VEVENT\r\n".
       "END:VCALENDAR"
     );
-    $this->assertEquals(
+    Assert::equals(
       new Date('1997-07-14 19:30:00 Europe/Berlin'),
       $calendar->date($calendar->events()->first()->dtstart()),
       $remark
@@ -217,7 +218,7 @@ class ICalendarTest extends \unittest\TestCase {
       "END:VEVENT\r\n".
       "END:VCALENDAR"
     );
-    $this->assertEquals(
+    Assert::equals(
       new Date('1997-07-14 17:30:00 UTC'),
       $calendar->date($calendar->events()->first()->dtstart()),
       $remark
@@ -248,7 +249,7 @@ class ICalendarTest extends \unittest\TestCase {
       "END:VEVENT\r\n".
       "END:VCALENDAR"
     );
-    $this->assertEquals(
+    Assert::equals(
       new Date('1997-07-14 19:30:00 Europe/Berlin'),
       $calendar->date($calendar->events()->first()->dtstart()),
       $remark
