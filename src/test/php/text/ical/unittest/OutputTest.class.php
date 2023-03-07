@@ -2,10 +2,11 @@
 
 use io\streams\{MemoryOutputStream, TextWriter};
 use text\ical\Output;
-use unittest\{Test, TestCase, Values};
+use test\Assert;
+use test\{Test, TestCase, Values};
 use util\Bytes;
 
-class OutputTest extends TestCase {
+class OutputTest {
 
   /**
    * Assertion helper
