@@ -3,6 +3,7 @@ iCal ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added PHP 8.4 to the test matrix - @thekid
 * Merged PR #9: Migrate to new testing library - @thekid
 
 ## 4.1.0 / 2022-12-17
